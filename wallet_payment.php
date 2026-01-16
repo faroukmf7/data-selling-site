@@ -41,12 +41,23 @@ if (!$user || !$user['email']) {
 <body>
     <div class="header">
         <div class="title">FastData</div>
-        <ul>
+        <button class="menu-toggle" id="menuToggle">
+            <i class='bx bx-menu' style="font-size: 0.8em;"></i>
+        </button>
+        <ul class="nav-menu" id="navMenu">
             <li><a href="index.php">Home</a></li>
             <li><a href="products.php">Products</a></li>
             <?php if (isLoggedIn()): ?>
                 <li><a href="dashboard.php">Dashboard</a></li>
+                <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+                    <li><a href="admin/">Admin</a></li>
+                <?php endif; ?>
+                <li><a href="logout.php">Logout</a></li>
+            <?php else: ?>
+                <li><a href="login.php">Login</a></li>
+                <li><a href="register.php">Register</a></li>
             <?php endif; ?>
+            <li><a href="#">Contact</a></li>
         </ul>
     </div>
 
@@ -83,7 +94,13 @@ if (!$user || !$user['email']) {
         <div class="footer-text">© 2026 FastData Inc.</div>
     </div>
 
+    <!-- Fixed button for request-callback -->
+    <div class="fixed-button">
+        <a href="login.php"><i class='bx bxs-phone'></i> Request-callback</a>
+    </div>
+
     <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="js/script.js"></script>
     <script>
         document.getElementById("paystack-button").addEventListener("click", function(e) {
             e.preventDefault();

@@ -65,6 +65,8 @@ if (!isset($result['data']['status']) || $result['data']['status'] !== 'success'
 $user_id = $_SESSION['user_id'];
 $amount = $result['data']['amount'] / 100; // Convert from kobo to GHS
 
+error_log("verify_wallet_payment.php - Payment verified. User: " . $user_id . ", Amount: " . $amount . ", Ref: " . $reference);
+
 // Start transaction
 $pdo->beginTransaction();
 
@@ -88,6 +90,14 @@ try {
 
     // Commit transaction
     $pdo->commit();
+
+    // Update session with new balance
+    $stmt = $pdo->prepare("SELECT balance FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user_data = $stmt->fetch();
+    if ($user_data) {
+        $_SESSION['user_balance'] = $user_data['balance'];
+    }
 
     // Clear session data
     unset($_SESSION['current_order']);

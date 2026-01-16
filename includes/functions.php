@@ -41,6 +41,35 @@ function getUserBalance($pdo, $user_id)
     return $user['balance'] ?? 0;
 }
 
+// Send email function
+function sendEmail($recipient_email, $recipient_name, $subject, $body)
+{
+    // Email configuration - Modify these for your server
+    $from_email = 'noreply@fastdata.local';
+    $from_name = 'FastData Support';
+
+    // Create email headers
+    $headers = "From: " . $from_name . " <" . $from_email . ">\r\n";
+    $headers .= "Reply-To: " . $from_email . "\r\n";
+    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+
+    // Compose full message
+    $message = "Dear " . htmlspecialchars($recipient_name) . ",\n\n";
+    $message .= $body . "\n\n";
+    $message .= "---\n";
+    $message .= "FastData Support Team\n";
+    $message .= SITE_URL . "\n";
+
+    // Send email
+    $result = mail($recipient_email, $subject, $message, $headers);
+
+    if (!$result) {
+        error_log("Failed to send email to: " . $recipient_email);
+    }
+
+    return $result;
+}
+
 // Generate transaction reference
 // function generateTransactionRef()
 // {
