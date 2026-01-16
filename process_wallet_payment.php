@@ -27,10 +27,25 @@ try {
         throw new Exception("Insufficient wallet balance.");
     }
 
+    // Create order record with all product details
+    $stmt = $pdo->prepare("INSERT INTO orders (user_id, product_id, quantity, unit_price, total_amount, recipient_number, data_amount, exam_type, network, category, payment_method, status, created_at) 
+                          VALUES (?, ?, 1, ?, ?, ?, ?, ?, ?, ?, 'wallet', 'completed', NOW())");
+    $stmt->execute([
+        $user_id,
+        $order['product_id'],
+        $order['total_amount'],
+        $order['total_amount'],
+        $order['recipient_number'],
+        $order['data_amount'] ?? null,
+        $order['exam_type'] ?? null,
+        $order['network'] ?? null,
+        $order['category'] ?? null
+    ]);
+
     // Create transaction record
     $transaction_id = 'TXN_' . time() . '_' . rand(1000, 9999);
-    $stmt = $pdo->prepare("INSERT INTO transactions (user_id, product_id, amount, recipient_number, transaction_id, status) 
-                          VALUES (?, ?, ?, ?, ?, 'successful')");
+    $stmt = $pdo->prepare("INSERT INTO transactions (user_id, product_id, amount, recipient_number, transaction_id, status, created_at) 
+                          VALUES (?, ?, ?, ?, ?, 'successful', NOW())");
     $stmt->execute([
         $user_id,
         $order['product_id'],
@@ -46,10 +61,6 @@ try {
 
     // Update session balance
     $_SESSION['user_balance'] = $new_balance;
-
-    // Create order record
-    $stmt = $pdo->prepare("INSERT INTO orders (user_id, total_amount, status) VALUES (?, ?, 'completed')");
-    $stmt->execute([$user_id, $order['total_amount']]);
 
     // Commit transaction
     $pdo->commit();

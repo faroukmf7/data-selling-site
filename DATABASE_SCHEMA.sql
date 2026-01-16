@@ -41,16 +41,27 @@ CREATE TABLE `products` (
   INDEX idx_created_at (created_at)
 );
 
--- Orders table
+-- Orders table (single product per order)
 CREATE TABLE `orders` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
   `user_id` INT NOT NULL,
+  `product_id` INT,
+  `quantity` INT DEFAULT 1,
+  `unit_price` DECIMAL(10, 2),
   `total_amount` DECIMAL(10, 2) NOT NULL,
+  `recipient_number` VARCHAR(20),
+  `data_amount` DECIMAL(10, 2),
+  `exam_type` VARCHAR(100),
+  `network` VARCHAR(50),
+  `category` VARCHAR(50),
+  `payment_method` VARCHAR(50),
   `status` ENUM('pending', 'processing', 'completed', 'cancelled') DEFAULT 'pending',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
   INDEX idx_user_id (user_id),
+  INDEX idx_product_id (product_id),
   INDEX idx_status (status),
   INDEX idx_created_at (created_at)
 );

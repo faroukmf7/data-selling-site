@@ -17,9 +17,10 @@ $stmt->execute([$user_id]);
 $user = $stmt->fetch();
 
 // Get recent transactions
-$stmt = $pdo->prepare("SELECT t.*, p.name as product_name, p.network 
+$stmt = $pdo->prepare("SELECT t.*, p.name as product_name, p.network, o.id as order_id
                       FROM transactions t 
-                      JOIN products p ON t.product_id = p.id 
+                      LEFT JOIN products p ON t.product_id = p.id 
+                      LEFT JOIN orders o ON o.user_id = t.user_id AND o.product_id = t.product_id AND DATE(o.created_at) = DATE(t.created_at)
                       WHERE t.user_id = ? 
                       ORDER BY t.created_at DESC 
                       LIMIT 10");
@@ -32,7 +33,7 @@ $transactions = $stmt->fetchAll();
         <h1>Welcome, <?php echo $user['username']; ?>!</h1>
         <div class="user-balance">
             Account Balance: <span class="balance-amount"><?php echo formatCurrency($user['balance']); ?></span>
-            <a href="#" class="btn-small">Add Funds</a>
+            <a href="add_funds.php" class="btn-small">Add Funds</a>
         </div>
     </div>
 
@@ -45,17 +46,13 @@ $transactions = $stmt->fetchAll();
                     <i class='bx bx-wifi'></i>
                     <span>Buy Data</span>
                 </a>
-                <a href="#" class="btn-action">
+                <a href="products.php" class="btn-action">
                     <i class='bx bx-phone'></i>
                     <span>Buy Airtime</span>
                 </a>
-                <a href="#" class="btn-action">
+                <a href="add_funds.php" class="btn-action">
                     <i class='bx bx-credit-card'></i>
                     <span>Add Funds</span>
-                </a>
-                <a href="cart.php" class="btn-action">
-                    <i class='bx bx-cart'></i>
-                    <span>View Cart</span>
                 </a>
             </div>
         </div>
@@ -77,11 +74,11 @@ $transactions = $stmt->fetchAll();
                     </thead>
                     <tbody>
                         <?php foreach ($transactions as $transaction): ?>
-                            <tr>
+                            <tr onclick="<?php if ($transaction['order_id']) { ?>window.location='order_details.php?id=<?php echo $transaction['order_id']; ?>';<?php } ?>" style="<?php if ($transaction['order_id']) { ?>cursor: pointer;<?php } ?>">
                                 <td><?php echo date('M d, H:i', strtotime($transaction['created_at'])); ?></td>
                                 <td>
-                                    <?php echo $transaction['product_name']; ?><br>
-                                    <small><?php echo $transaction['network']; ?></small>
+                                    <?php echo $transaction['product_name'] ?? 'Wallet Top-up'; ?><br>
+                                    <small><?php echo $transaction['network'] ?? 'N/A'; ?></small>
                                 </td>
                                 <td><?php echo formatCurrency($transaction['amount']); ?></td>
                                 <td>
@@ -93,7 +90,7 @@ $transactions = $stmt->fetchAll();
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-                <a href="#" class="view-all">View All Transactions</a>
+                <a href="dashboard.php" class="view-all" style="display: block; text-align: center; margin-top: 15px;">All transactions shown above</a>
             <?php endif; ?>
         </div>
 
@@ -119,8 +116,8 @@ $transactions = $stmt->fetchAll();
                 </div>
             </div>
             <div class="account-actions">
-                <a href="#" class="btn-small">Edit Profile</a>
-                <a href="#" class="btn-small">Change Password</a>
+                <a href="edit_profile.php" class="btn-small">Edit Profile</a>
+                <a href="change_password.php" class="btn-small">Change Password</a>
             </div>
         </div>
     </div>
