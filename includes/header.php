@@ -24,12 +24,14 @@ require_once 'functions.php';
     <!-- Header section -->
     <div class="header">
         <div class="title">FastData</div>
-        <ul>
+        <button class="menu-toggle" id="menuToggle">
+            <i class='bx bx-menu' style="font-size: 0.8em;"></i>
+        </button>
+        <ul class="nav-menu" id="navMenu">
             <li><a href="index.php">Home</a></li>
             <li><a href="products.php">Products</a></li>
             <?php if (isLoggedIn()): ?>
                 <li><a href="dashboard.php">Dashboard</a></li>
-                <li><a href="cart.php">Cart</a></li>
                 <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
                     <li><a href="admin/">Admin</a></li>
                 <?php endif; ?>
