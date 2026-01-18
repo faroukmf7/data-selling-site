@@ -70,9 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         redirect('products.php');
     }
 
-    // Redirect to payment
-    redirect('paystack_payment.php');
-    exit();
+    // Stay on checkout page to show payment options
+    // No redirect - payment options are shown below
 }
 
 // If no current order, redirect to products
@@ -125,11 +124,11 @@ $order = $_SESSION['current_order'];
             <h3>Select Payment Method</h3>
 
             <div class="payment-method">
-                <a href="paystack_payment.php" class="payment-option-btn">
+                <button id="paystack-button" class="payment-option-btn paystack-btn">
                     <i class='bx bx-credit-card'></i>
                     <span>Pay with Card/Mobile Money</span>
                     <small>Secure payment via Paystack</small>
-                </a>
+                </button>
             </div>
 
             <?php if (getUserBalance($pdo, $_SESSION['user_id']) >= $order['total_amount']): ?>
@@ -161,5 +160,59 @@ $order = $_SESSION['current_order'];
         </div>
     </div>
 </div>
+
+<?php
+// Generate payment reference if needed for Paystack
+$payment_reference = 'PAY_' . time() . '_' . $_SESSION['user_id'] . '_' . rand(1000, 9999);
+$_SESSION['payment_reference'] = $payment_reference;
+?>
+
+<!-- Paystack Inline JS -->
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+    document.getElementById('paystack-button').addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const paystackKey = '<?php echo PAYSTACK_PUBLIC_KEY; ?>';
+        
+        // Check if key is set
+        if (!paystackKey || paystackKey.trim() === '') {
+            alert('Payment system not configured. Please contact support.');
+            return false;
+        }
+
+        const handler = PaystackPop.setup({
+            key: paystackKey,
+            email: '<?php echo htmlspecialchars($_SESSION['user_email'] ?? ''); ?>',
+            amount: <?php echo (int)($order['total_amount'] * 100); ?>,
+            currency: 'GHS',
+            ref: '<?php echo htmlspecialchars($payment_reference); ?>',
+            channels: ['mobile_money'],
+            callback: function(response) {
+                // Redirect to verification page
+                window.location.href = 'verify_payment.php?reference=' + encodeURIComponent(response.reference);
+            },
+            onError: function(error) {
+                alert('Payment error: ' + error.message);
+            },
+            onClose: function() {
+                console.log('Payment popup closed');
+            }
+        });
+
+        handler.openIframe();
+        return false;
+    });
+
+    // Fallback for button that might not be found
+    window.addEventListener('load', function() {
+        const btn = document.getElementById('paystack-button');
+        if (!btn) {
+            console.error('Payment button not found');
+        } else {
+            console.log('Payment button ready');
+        }
+    });
+</script>
 
 <?php require_once 'includes/footer.php'; ?>

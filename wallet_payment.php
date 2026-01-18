@@ -104,24 +104,34 @@ if (!$user || !$user['email']) {
     <script>
         document.getElementById("paystack-button").addEventListener("click", function(e) {
             e.preventDefault();
-
-            var handler = PaystackPop.setup({
-                key: '<?php echo PAYSTACK_PUBLIC_KEY; ?>',
-                email: '<?php echo $user['email']; ?>',
-                amount: <?php echo intval($amount * 100); ?>, // Amount in kobo
-                ref: '<?php echo $reference; ?>',
-                currency: 'GHS',
-                onClose: function() {
-                    alert('Payment window closed.');
-                },
-                onSuccess: function(response) {
-                    // Payment successful, verify and redirect
-                    if (response.reference) {
-                        window.location.href = 'verify_wallet_payment.php?reference=' + response.reference;
+            try {
+                
+                var handler = PaystackPop.setup({
+                    key: '<?php echo PAYSTACK_PUBLIC_KEY; ?>',
+                    email: '<?php echo $user['email']; ?>',
+                    amount: <?php echo intval($amount * 100); ?>, // Amount in kobo
+                    ref: '<?php echo $reference; ?>',
+                    currency: 'GHS',
+                    onClose: function() {
+                        alert('Payment window closed.');
+                    },
+                    callback: function(response) {
+                        
+                        // Payment successful, verify and redirect
+                        if (response.reference) {
+                            window.location.href = 'verify_wallet_payment.php?reference=' + response.reference;
+                        }
                     }
-                }
-            });
-            handler.openIframe();
+                });
+                handler.openIframe();
+                
+
+            }catch (err) {
+                console.error("Paystack setup error: ", err);
+                alert('An error occurred while initiating payment. Please try again.');
+            }
+
+
         });
     </script>
 </body>

@@ -1,37 +1,21 @@
 <?php
-// paystack_payment.php
+// guest_payment.php
 require_once 'includes/config.php';
 require_once 'includes/functions.php';
 
-if (!isLoggedIn()) {
-    redirect('login.php');
-}
-
-if (!isset($_SESSION['current_order'])) {
-    $_SESSION['message'] = "No order to process.";
+if (!isset($_SESSION['current_order']) || !$_SESSION['current_order']['is_guest']) {
+    $_SESSION['message'] = "Invalid guest order.";
     redirect('products.php');
 }
 
 $order = $_SESSION['current_order'];
-$user_id = $_SESSION['user_id'];
 
 // Generate unique reference
-$reference = 'PAY_' . time() . '_' . $user_id . '_' . rand(1000, 9999);
+$reference = 'GUEST_' . time() . '_' . rand(100000, 999999);
 
 // Store reference in session
 $_SESSION['payment_reference'] = $reference;
 $_SESSION['payment_amount'] = $order['total_amount'] * 100; // Convert to kobo
-
-// Get user email
-$stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
-$stmt->execute([$user_id]);
-$user = $stmt->fetch();
-
-// Check if user exists and has email
-if (!$user || !$user['email']) {
-    $_SESSION['message'] = "Unable to retrieve user information.";
-    redirect('checkout.php');
-}
 ?>
 
 <!DOCTYPE html>
@@ -40,7 +24,7 @@ if (!$user || !$user['email']) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment - FastData</title>
+    <title>Guest Payment - FastData</title>
     <link rel="stylesheet" href="css/style.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
@@ -51,18 +35,28 @@ if (!$user || !$user['email']) {
         <ul>
             <li><a href="index.php">Home</a></li>
             <li><a href="products.php">Products</a></li>
-            <li><a href="dashboard.php">Dashboard</a></li>
+            <li><a href="login.php">Login</a></li>
+            <li><a href="register.php">Register</a></li>
         </ul>
     </div>
 
     <div class="content">
         <div class="payment-container">
             <h1>Complete Payment</h1>
+            <p class="subtitle">Guest Purchase - No Account Required</p>
 
             <div class="payment-info">
                 <div class="info-row">
                     <span>Order:</span>
-                    <span><?php echo $order['product_name']; ?></span>
+                    <span><?php echo htmlspecialchars($order['product_name']); ?></span>
+                </div>
+                <div class="info-row">
+                    <span>Recipient:</span>
+                    <span><?php echo htmlspecialchars($order['recipient_number']); ?></span>
+                </div>
+                <div class="info-row">
+                    <span>Email:</span>
+                    <span><?php echo htmlspecialchars($order['guest_email']); ?></span>
                 </div>
                 <div class="info-row">
                     <span>Amount:</span>
@@ -79,9 +73,14 @@ if (!$user || !$user['email']) {
             </button>
 
             <div class="alternative-payment">
-                <a href="checkout.php" class="btn-secondary">
-                    <i class='bx bx-arrow-back'></i> Back to Checkout
+                <a href="products.php" class="btn-secondary">
+                    <i class='bx bx-arrow-back'></i> Cancel
                 </a>
+            </div>
+
+            <div class="info-box">
+                <h4><i class='bx bx-shield'></i> Secure Payment</h4>
+                <p>This payment is secured by Paystack. Your card information is never shared with FastData.</p>
             </div>
         </div>
     </div>
@@ -102,13 +101,14 @@ if (!$user || !$user['email']) {
 
             const handler = PaystackPop.setup({
                 key: paystackKey,
-                email: '<?php echo htmlspecialchars($user['email']); ?>',
+                email: '<?php echo htmlspecialchars($order['guest_email']); ?>',
                 amount: <?php echo (int)($order['total_amount'] * 100); ?>,
                 currency: 'GHS',
                 ref: '<?php echo htmlspecialchars($reference); ?>',
-                onSuccess: function(response) {
-                    // Redirect to verification page
-                    window.location.href = 'verify_payment.php?reference=' + encodeURIComponent(response.reference);
+                channels: ['mobile_money'],
+                callback: function(response) {
+                    // Redirect to guest verification page
+                    window.location.href = 'guest_verify_payment.php?reference=' + encodeURIComponent(response.reference);
                 },
                 onError: function(error) {
                     alert('Payment error: ' + error.message);

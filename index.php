@@ -20,6 +20,7 @@ require_once 'includes/header.php';
     <!-- Quick Purchase Section -->
     <div class="quick-purchase">
         <h2>Quick Purchase</h2>
+        <p class="quick-subtitle">Select a product to get started</p>
         <div class="quick-grid">
             <a href="products.php?network=MTN&category=data" class="quick-item">
                 <img src="images/MTN.png" alt="MTN">
@@ -51,6 +52,19 @@ require_once 'includes/header.php';
                 <small>WAEC, NECO, BECE</small>
             </a>
         </div>
+
+        <?php if (!isLoggedIn()): ?>
+            <div class="guest-option">
+                <p>Don't have an account?</p>
+                <a href="products.php" class="btn-guest-option">
+                    <i class='bx bx-user'></i> Continue as Guest
+                </a>
+                <span class="divider">or</span>
+                <a href="login.php" class="btn-login-option">
+                    <i class='bx bx-log-in'></i> Login
+                </a>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
