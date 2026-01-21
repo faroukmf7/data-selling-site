@@ -70,8 +70,40 @@ function sendEmail($recipient_email, $recipient_name, $subject, $body)
     return $result;
 }
 
-// Generate transaction reference
-// function generateTransactionRef()
-// {
-//     return 'TXN_' . time() . '_' . rand(1000, 9999);
-// }
+// Sanitize input function
+function sanitizeInput($input)
+{
+    return htmlspecialchars(strip_tags(trim($input ?? '')));
+}
+
+// Check if complaints table exists and create if needed
+function ensureComplaintsTableExists($pdo)
+{
+    try {
+        $pdo->query("SELECT 1 FROM complaints LIMIT 1");
+    } catch (PDOException $e) {
+        // Table doesn't exist, create it
+        $sql = "CREATE TABLE `complaints` (
+            `id` INT PRIMARY KEY AUTO_INCREMENT,
+            `user_id` INT NOT NULL,
+            `order_id` INT,
+            `title` VARCHAR(255) NOT NULL,
+            `description` TEXT NOT NULL,
+            `status` ENUM('pending', 'in_review', 'resolved', 'rejected') DEFAULT 'pending',
+            `priority` ENUM('low', 'medium', 'high') DEFAULT 'medium',
+            `category` VARCHAR(100),
+            `resolution_note` TEXT,
+            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL,
+            INDEX idx_user_id (user_id),
+            INDEX idx_order_id (order_id),
+            INDEX idx_status (status),
+            INDEX idx_created_at (created_at),
+            INDEX idx_user_created (user_id, created_at)
+        )";
+        $pdo->exec($sql);
+    }
+}
+

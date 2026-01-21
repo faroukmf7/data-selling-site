@@ -46,7 +46,7 @@ $networks_stmt = $pdo->query("SELECT DISTINCT network FROM products ORDER BY net
 ?>
 
 <div class="admin-content">
-    <h1>Edit Product</h1>
+    <h1 class="admin-dashboard-header">Edit Product</h1>
 
     <?php if (isset($error)): ?>
         <div class="error-message"><?php echo $error; ?></div>

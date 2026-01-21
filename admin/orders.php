@@ -115,7 +115,7 @@ $total_pages = ceil($total_orders / $limit);
 ?>
 
 <div class="admin-content">
-    <h1>Manage Orders</h1>
+    <h1 class="admin-dashboard-header">Manage Orders</h1>
 
     <!-- Filters -->
     <div class="filters-box">

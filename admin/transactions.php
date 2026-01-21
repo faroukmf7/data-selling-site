@@ -102,7 +102,7 @@ $networks = $networks_stmt->fetchAll();
 ?>
 
 <div class="admin-content">
-    <h1>Transactions</h1>
+    <h1 class="admin-dashboard-header">Transactions</h1>
 
     <!-- Filters -->
     <div class="filters-box">

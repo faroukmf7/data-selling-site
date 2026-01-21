@@ -4,17 +4,30 @@ document.addEventListener("DOMContentLoaded", function () {
   // Mobile menu toggle
   const menuToggle = document.getElementById("menuToggle");
   const navMenu = document.getElementById("navMenu");
+  const body = document.body;
 
   if (menuToggle) {
     menuToggle.addEventListener("click", function () {
       navMenu.classList.toggle("active");
+      body.classList.toggle("menu-open");
     });
+
+    // Close button functionality
+    const closeButton = navMenu.querySelector(".bx-x");
+    if (closeButton) {
+      closeButton.parentElement.addEventListener("click", function (e) {
+        e.stopPropagation();
+        navMenu.classList.remove("active");
+        body.classList.remove("menu-open");
+      });
+    }
 
     // Close menu when a link is clicked
     const navLinks = navMenu.querySelectorAll("a");
     navLinks.forEach((link) => {
       link.addEventListener("click", function () {
         navMenu.classList.remove("active");
+        body.classList.remove("menu-open");
       });
     });
 
@@ -22,6 +35,15 @@ document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("click", function (event) {
       if (!event.target.closest(".header")) {
         navMenu.classList.remove("active");
+        body.classList.remove("menu-open");
+      }
+    });
+
+    // Close menu when clicking on the blur background
+    document.addEventListener("click", function (event) {
+      if (event.target === document.body && navMenu.classList.contains("active")) {
+        navMenu.classList.remove("active");
+        body.classList.remove("menu-open");
       }
     });
   }

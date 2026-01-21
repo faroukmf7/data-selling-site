@@ -5,7 +5,7 @@ require_once 'includes/admin_header.php';
 ?>
 
 <div class="admin-content">
-    <h1>Dashboard</h1>
+    <h1 class="admin-dashboard-header">Dashboard</h1>
 
     <!-- Quick Stats -->
     <div class="admin-stats">
@@ -87,99 +87,103 @@ require_once 'includes/admin_header.php';
     <!-- Recent Orders -->
     <div class="admin-table-container">
         <h2>Recent Orders</h2>
-        <?php
-        $stmt = $pdo->query("SELECT o.*, u.username FROM orders o 
-                            JOIN users u ON o.user_id = u.id 
-                            ORDER BY o.created_at DESC LIMIT 10");
-        $orders = $stmt->fetchAll();
-        ?>
+        <div class="admin-table-responsive">
+            <?php
+            $stmt = $pdo->query("SELECT o.*, u.username FROM orders o 
+                                JOIN users u ON o.user_id = u.id 
+                                ORDER BY o.created_at DESC LIMIT 10");
+            $orders = $stmt->fetchAll();
+            ?>
 
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($orders)): ?>
+            <table class="admin-table">
+                <thead>
                     <tr>
-                        <td colspan="6" style="text-align: center;">No orders found</td>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
                     </tr>
-                <?php else: ?>
-                    <?php foreach ($orders as $order): ?>
+                </thead>
+                <tbody>
+                    <?php if (empty($orders)): ?>
                         <tr>
-                            <td>#<?php echo str_pad($order['id'], 6, '0', STR_PAD_LEFT); ?></td>
-                            <td><?php echo $order['username']; ?></td>
-                            <td><?php echo formatCurrency($order['total_amount']); ?></td>
-                            <td>
-                                <span class="status-badge status-<?php echo $order['status']; ?>">
-                                    <?php echo ucfirst($order['status']); ?>
-                                </span>
-                            </td>
-                            <td><?php echo date('M d, Y H:i', strtotime($order['created_at'])); ?></td>
-                            <td class="actions">
-                                <a href="order_details.php?id=<?php echo $order['id']; ?>" class="btn-admin btn-secondary btn-small">
-                                    <i class='bx bx-show'></i>
-                                </a>
-                            </td>
+                            <td colspan="6" style="text-align: center;">No orders found</td>
                         </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                    <?php else: ?>
+                        <?php foreach ($orders as $order): ?>
+                            <tr>
+                                <td>#<?php echo str_pad($order['id'], 6, '0', STR_PAD_LEFT); ?></td>
+                                <td><?php echo $order['username']; ?></td>
+                                <td><?php echo formatCurrency($order['total_amount']); ?></td>
+                                <td>
+                                    <span class="status-badge status-<?php echo $order['status']; ?>">
+                                        <?php echo ucfirst($order['status']); ?>
+                                    </span>
+                                </td>
+                                <td><?php echo date('M d, Y H:i', strtotime($order['created_at'])); ?></td>
+                                <td class="actions">
+                                    <a href="order_details.php?id=<?php echo $order['id']; ?>" class="btn-admin btn-secondary btn-small">
+                                        <i class='bx bx-show'></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Recent Transactions -->
     <div class="admin-table-container">
         <h2>Recent Transactions</h2>
-        <?php
-        $stmt = $pdo->query("SELECT t.*, u.username, p.name as product_name 
-                            FROM transactions t 
-                            JOIN users u ON t.user_id = u.id 
-                            JOIN products p ON t.product_id = p.id 
-                            ORDER BY t.created_at DESC LIMIT 10");
-        $transactions = $stmt->fetchAll();
-        ?>
+        <div class="admin-table-responsive">
+            <?php
+            $stmt = $pdo->query("SELECT t.*, u.username, p.name as product_name 
+                                FROM transactions t 
+                                JOIN users u ON t.user_id = u.id 
+                                JOIN products p ON t.product_id = p.id 
+                                ORDER BY t.created_at DESC LIMIT 10");
+            $transactions = $stmt->fetchAll();
+            ?>
 
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Transaction ID</th>
-                    <th>Customer</th>
-                    <th>Product</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($transactions)): ?>
+            <table class="admin-table">
+                <thead>
                     <tr>
-                        <td colspan="6" style="text-align: center;">No transactions found</td>
+                        <th>Transaction ID</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
                     </tr>
-                <?php else: ?>
-                    <?php foreach ($transactions as $transaction): ?>
+                </thead>
+                <tbody>
+                    <?php if (empty($transactions)): ?>
                         <tr>
-                            <td><?php echo $transaction['transaction_id']; ?></td>
-                            <td><?php echo $transaction['username']; ?></td>
-                            <td><?php echo $transaction['product_name']; ?></td>
-                            <td><?php echo formatCurrency($transaction['amount']); ?></td>
-                            <td>
-                                <span class="status-badge status-<?php echo $transaction['status']; ?>">
-                                    <?php echo ucfirst($transaction['status']); ?>
-                                </span>
-                            </td>
-                            <td><?php echo date('M d, H:i', strtotime($transaction['created_at'])); ?></td>
+                            <td colspan="6" style="text-align: center;">No transactions found</td>
                         </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                    <?php else: ?>
+                        <?php foreach ($transactions as $transaction): ?>
+                            <tr>
+                                <td><?php echo $transaction['transaction_id']; ?></td>
+                                <td><?php echo $transaction['username']; ?></td>
+                                <td><?php echo $transaction['product_name']; ?></td>
+                                <td><?php echo formatCurrency($transaction['amount']); ?></td>
+                                <td>
+                                    <span class="status-badge status-<?php echo $transaction['status']; ?>">
+                                        <?php echo ucfirst($transaction['status']); ?>
+                                    </span>
+                                </td>
+                                <td><?php echo date('M d, H:i', strtotime($transaction['created_at'])); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

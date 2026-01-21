@@ -1,55 +1,64 @@
-<?php
-// add_funds.php
-$page_title = "Add Funds";
-require_once 'includes/header.php';
+<!DOCTYPE html>
+<html lang="en">
 
-// Check if user is logged in
-if (!isLoggedIn()) {
-    $_SESSION['message'] = "Please login to add funds.";
-    redirect('login.php');
-}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Funds - FastData</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px;
+            width: 100%;
+            border: none;
+            margin: 0px 0px 10px 0px;
+            border-radius: 0px;
+            background-color: #2b2d42;
+        }
+    </style>
+</head>
 
-$user_id = $_SESSION['user_id'];
-$error = '';
-$success = '';
+<body>
 
-// Get current user
-$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-$stmt->execute([$user_id]);
-$user = $stmt->fetch();
+    <!-- Header section -->
+    <div class="header">
+        <div class="title">Flashdata</div>
+        <button class="menu-toggle" id="menuToggle">
+            <i class='bx bx-menu' style="font-size: 0.8em;"></i>
+        </button>
+        <ul class="nav-menu" id="navMenu">
+            <li style=" display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            width: 100%;
+            border: none;
+            margin: 0px 0px 10px 0px;
+            border-radius: 0px;
+            background-color: #2b2d42;">
+                <div>
+                    <div><i class='bx bx-fast-forward' style="font-size: 1.5em;"></i></div>
+                    <div style="font-size: 1.8em;">FlashData</div>
+                </div>
+                <div><i class='bx bx-x' style="font-size: 1.5em;"></i></div>
+            </li>
+                            <li><i class='bx bxs-dashboard nav-icon'></i><a href="dashboard.php">Dashboard</a></li>
+                <li><i class='bx bx-receipt nav-icon'></i><a href="all_transactions.php">Transactions</a></li>
+                        <li><i class='bx bx-home nav-icon'></i><a href="index.php">Home</a></li>
+            <li><i class='bx bx-cabinet nav-icon'></i><a href="products.php">Products</a></li>
+                            <li><i class='bx bx-message-square-error nav-icon'></i><a href="complaints.php">Complaints</a></li>
+                                                <li class="nav-contact" style="margin: 20px 20px; padding: 10px 10px"><i class='bx bxl-whatsapp nav-icon' style="background-color: hsla(120, 89%, 45%, 0.60);"></i><a href="#">Join our community</a></li>
+                                                <li> <i class='bx bxl-graphql nav-icon'></i><a href="admin/">Admin</a></li>
+                                <li><i class='bx bx-log-out-circle nav-icon'></i> <a href="logout.php">Logout</a></li>
+                    </ul>
+    </div>
 
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $amount = (float)$_POST['amount'];
-
-    if ($amount <= 0) {
-        $error = "Amount must be greater than 0.";
-    } elseif ($amount > 10000) {
-        $error = "Maximum amount is GHS 10,000 per transaction.";
-    } else {
-        // Create a wallet topup order
-        $_SESSION['current_order'] = [
-            'product_id' => 0,  // 0 means wallet topup
-            'product_name' => 'Wallet Top-up',
-            'total_amount' => $amount,
-            'recipient_number' => $user['phone'],
-            'data_amount' => null,
-            'exam_type' => null,
-            'network' => null,
-            'category' => 'wallet',
-        ];
-
-        // Generate reference for wallet topup
-        $reference = 'WALLET_' . time() . '_' . $user_id . '_' . rand(1000, 9999);
-        $_SESSION['wallet_reference'] = $reference;
-        $_SESSION['wallet_amount'] = $amount * 100; // Convert to kobo for Paystack
-
-        // Redirect to Paystack payment page
-        redirect('wallet_payment.php');
-    }
-}
-?>
-
+    <!-- Display flash messages -->
+    
 <div class="content">
     <div class="add-funds-container">
         <div class="funds-card">
@@ -57,17 +66,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <div class="current-balance">
                 <h3>Current Balance</h3>
-                <div class="balance-display"><?php echo formatCurrency($user['balance']); ?></div>
+                <div class="balance-display">GHS 561.67</div>
             </div>
 
-            <?php if ($error): ?>
-                <div class="error-message"><?php echo $error; ?></div>
-            <?php endif; ?>
-
-            <?php if ($success): ?>
-                <div class="success-message"><?php echo $success; ?></div>
-            <?php endif; ?>
-
+            
+            
             <form method="POST" action="">
                 <div class="form-group">
                     <label for="amount">Amount to Add (GHS)</label>
@@ -113,16 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <!-- Recent Wallet Transactions -->
         <div class="funds-transactions">
             <h3>Recent Transactions</h3>
-            <?php
-            $stmt = $pdo->prepare("SELECT * FROM transactions WHERE user_id = ? AND product_id IS NULL ORDER BY created_at DESC LIMIT 5");
-            $stmt->execute([$user_id]);
-            $transactions = $stmt->fetchAll();
-
-            if (empty($transactions)):
-            ?>
-                <p class="no-data">No wallet transactions yet.</p>
-            <?php else: ?>
-                <table class="transactions-list">
+                            <table class="transactions-list">
                     <thead>
                         <tr>
                             <th>Date</th>
@@ -131,17 +125,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($transactions as $txn): ?>
-                        <tr>
-                            <td><?php echo date('M d, H:i', strtotime($txn['created_at'])); ?></td>
-                            <td><?php echo formatCurrency($txn['amount']); ?></td>
-                            <td><span class="status-badge status-<?php echo $txn['status']; ?>"><?php echo ucfirst($txn['status']); ?></span></td>
+                                                <tr>
+                            <td>Jan 16, 20:17</td>
+                            <td>GHS 50.00</td>
+                            <td><span class="status-badge status-successful">Successful</span></td>
                         </tr>
-                        <?php endforeach; ?>
-                    </tbody>
+                                                <tr>
+                            <td>Jan 16, 20:16</td>
+                            <td>GHS 500.00</td>
+                            <td><span class="status-badge status-successful">Successful</span></td>
+                        </tr>
+                                            </tbody>
                 </table>
-            <?php endif; ?>
-        </div>
+                    </div>
     </div>
 </div>
 
@@ -225,6 +221,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     padding: 20px;
     border-radius: 5px;
     margin-top: 20px;
+    width: 60vw;
 }
 
 .funds-info h4 {
@@ -236,6 +233,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 .funds-info ul {
     margin: 0;
     padding-left: 20px;
+    flex-direction: column;
 }
 
 .funds-info li {
@@ -297,6 +295,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         flex-direction: column;
     }
 }
+
+@media (min-width: 800px) {
+    .add-funds-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+
+    .funds-card {
+        grid-column: 1;
+    }
+
+    .funds-transactions {
+        grid-column: 2;
+        height: fit-content;
+    }
+}
 </style>
 
-<?php require_once 'includes/footer.php'; ?>
+<div class="footer">
+    <div class="footer-text">© 2026 FastData Inc.</div>
+</div>
+
+<!-- Fixed button for request-callback -->
+<div class="fixed-button">
+    <a href="login.php"><i class='bx bxs-phone'></i> Request-callback</a>
+</div>
+
+<script src="js/script.js"></script>
+</body>
+
+</html>

@@ -27,7 +27,7 @@ $products = $stmt->fetchAll();
 ?>
 
 <div class="admin-content">
-    <h1>Manage Products</h1>
+    <h1 class="admin-dashboard-header">Manage Products</h1>
 
     <div class="quick-actions">
         <a href="add_product.php" class="btn-admin btn-primary">

@@ -92,7 +92,7 @@ $total_pages = ceil($total_users / $limit);
 ?>
 
 <div class="admin-content">
-    <h1>Manage Users</h1>
+    <h1 class="admin-dashboard-header">Manage Users</h1>
 
     <!-- Search Form -->
     <div class="search-box">

@@ -55,7 +55,7 @@ $transaction = $stmt->fetch();
 
 <div class="admin-content">
     <div class="order-details-header">
-        <h1>Order #<?php echo str_pad($order['id'], 6, '0', STR_PAD_LEFT); ?></h1>
+        <h1 class="admin-dashboard-header">Order #<?php echo str_pad($order['id'], 6, '0', STR_PAD_LEFT); ?></h1>
         <a href="orders.php" class="btn-admin btn-secondary">
             <i class='bx bx-arrow-back'></i> Back to Orders
         </a>

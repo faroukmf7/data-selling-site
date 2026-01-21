@@ -28,23 +28,55 @@ if (isLoggedIn() && !isset($_SESSION['user_email'])) {
     <title><?php echo isset($page_title) ? $page_title . ' - ' : ''; ?>FastData</title>
     <link rel="stylesheet" href="css/style.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px;
+            width: 100%;
+            border: none;
+            margin: 0px 0px 10px 0px;
+            border-radius: 0px;
+            background-color: #2b2d42;
+        }
+    </style>
 </head>
 
 <body>
 
     <!-- Header section -->
     <div class="header">
-        <div class="title">FastData</div>
+        <div class="title">Flashdata</div>
         <button class="menu-toggle" id="menuToggle">
             <i class='bx bx-menu' style="font-size: 0.8em;"></i>
         </button>
         <ul class="nav-menu" id="navMenu">
+            <li style=" display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            width: 100%;
+            border: none;
+            margin: 0px 0px 10px 0px;
+            border-radius: 0px;
+            background-color: #2b2d42;">
+                <div>
+                    <div><i class='bx bx-fast-forward' style="font-size: 1.5em;"></i></div>
+                    <div style="font-size: 1.8em;">FlashData</div>
+                </div>
+                <div><i class='bx bx-x' style="font-size: 1.5em;"></i></div>
+            </li>
             <?php if (isLoggedIn()): ?>
                 <li><i class='bx bxs-dashboard nav-icon'></i><a href="dashboard.php">Dashboard</a></li>
+                <li><i class='bx bx-receipt nav-icon'></i><a href="all_transactions.php">Transactions</a></li>
             <?php else: ?>
             <?php endif; ?>
             <li><i class='bx bx-home nav-icon'></i><a href="index.php">Home</a></li>
             <li><i class='bx bx-cabinet nav-icon'></i><a href="products.php">Products</a></li>
+            <?php if (isLoggedIn()): ?>
+                <li><i class='bx bx-message-square-error nav-icon'></i><a href="complaints.php">Complaints</a></li>
+            <?php endif; ?>
             <?php if (!isLoggedIn()): ?>
                 <li><i class='bx bx-log-in-circle nav-icon'></i><a href="login.php">Login</a></li>
                 <li><i class='bx bx-edit nav-icon'></i><a href="register.php">Register</a></li>
